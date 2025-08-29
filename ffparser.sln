@@ -1,0 +1,31 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.34729.46
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "ffparser", "src\ffparser.vcxproj", "{CC375B6D-9C00-4CAE-BA16-45F7E8B2EFF2}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|x64 = Debug|x64
+		Debug|x86 = Debug|x86
+		Release|x64 = Release|x64
+		Release|x86 = Release|x86
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{CC375B6D-9C00-4CAE-BA16-45F7E8B2EFF2}.Debug|x64.ActiveCfg = Debug|x64
+		{CC375B6D-9C00-4CAE-BA16-45F7E8B2EFF2}.Debug|x64.Build.0 = Debug|x64
+		{CC375B6D-9C00-4CAE-BA16-45F7E8B2EFF2}.Debug|x86.ActiveCfg = Debug|Win32
+		{CC375B6D-9C00-4CAE-BA16-45F7E8B2EFF2}.Debug|x86.Build.0 = Debug|Win32
+		{CC375B6D-9C00-4CAE-BA16-45F7E8B2EFF2}.Release|x64.ActiveCfg = Release|x64
+		{CC375B6D-9C00-4CAE-BA16-45F7E8B2EFF2}.Release|x64.Build.0 = Release|x64
+		{CC375B6D-9C00-4CAE-BA16-45F7E8B2EFF2}.Release|x86.ActiveCfg = Release|Win32
+		{CC375B6D-9C00-4CAE-BA16-45F7E8B2EFF2}.Release|x86.Build.0 = Release|Win32
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {74BE4D68-636C-45C9-BAE3-8F8A98565072}
+	EndGlobalSection
+EndGlobal
