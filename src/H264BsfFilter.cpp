@@ -40,9 +40,9 @@ int H264BsfFilter::filter(AVPacket* pkt) {
     for (int i = 0; i < 4; i++)
         nalsize = ((unsigned)nalsize << 8) | pkt->data[i];
 
-    if (nalsize != pkt->size) {
+    /*if (nalsize != pkt->size) {
         MMLOGW("Invalid nal size:%d, pkt->size:%d", nalsize, pkt->size);
-    }
+    }*/
     // Check if data is already in Annex-B format (has start code)
     if (hasStartCode(pkt->data, pkt->size)) {
         MMLOGI("H264BsfFilter::filter: data already in Annex-B format");

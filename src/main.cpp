@@ -1,4 +1,5 @@
 #include "FFDemuxer.h"
+#include "argparse.hpp"
 int parserFlag(const char* str)
 {
 	int enable_flag = 0;
@@ -26,55 +27,73 @@ int parserFlag(const char* str)
 	return enable_flag;
 }
 
-int get_height(int w, int h, int tow)
-{
-    w = w ? w : 1;
-    int ret = tow * h / w;
-    ret &= ~7;
-
-    int a = ret % 4;
-    if (a == 1)
-    {
-        ret -= 1;
-    }
-    if (a == 2)
-    {
-        ret += 2;
-    }
-    if (a == 3)
-    {
-        ret += 1;
-    }
-    return ret;
-}
-
 int main(int argc, const char** argv)
 {
-	//freopen("log.txt", "w", stdout);
-	FFDemuxer* ffdec = new FFDemuxer();//std::make_shared<FFDemuxer>();
-	//const char* purl = "C:\\Users\\Administrator\\Desktop\\1\\5151695557554952695754505254506648526950525466685670574956567051.mkv_1920x800-1.ts";
-	//const char* purl = "D:\\Downloads\\Jade.No.Poverty.Land.E09.1080i.HDTV.H264-NGB.ts";
-	const char* purl = "D:\\Downloads\\Frozen.2013.UHD.BluRay.2160p.10bit.HDR.4Audio.TrueHD(Atmos).7.1.DTS-HD.MA.7.1.x265-beAst.mkv";
-	//const char* purl = "D:\\Downloads\\kongfupanna4.mkv";
-	//const char* purl = "C:\\Users\\Administrator\\Desktop\\1\\1920x804_6000000_00000.ts";//5151695557554952695754505254506648526950525466685670574956567051.mkv_1920x800-1.ts";// 
-	//const char* purl = "D:\\code\\debug\\mediaserver\\build\\src\\server_app\\1920x1080_5000000_01563.ts";
-	//const char* purl = "D:\\code\\debug\\mediaserver\\build\\src\\server_app\\6549526850574865546657666553526855696557694853495253685368495653.mkv_1920x1080-1563.ts";
-	//const char* purl = "D:\\Downloads\\9_(AVC_M@L4.1_722x406_2021K.AAC_128_44K_2ch)The_Police_Certifiable_2010.mov";
-	//const char* purl = "D:\\Downloads\\h264_1920x816_7555462_1_none_00004.ts";
-	//const char* purl = "D:\\Downloads\\8K_HDR_Weathering_With_You.mp4";
-	if (argc >= 2)
-	{
-		purl = argv[1];
-	}
-
-    get_height(1920, 1010, 1920);
 	int parser_flag = 0;
 	int dec_flag = 0;
     int write_flag = 0;
     int64_t begin = 0;
     int log_flag = 0;
     int64_t end = INT_MAX;
-	int i = 2;
+	std::string log_path;
+    std::string input_url;
+
+	argparse::ArgumentParser arg_parser("ffparser");
+    arg_parser.add_argument("-i").help("input file path");
+	arg_parser.add_argument("-p").help("printf packet timestamp of media packet, a:audio,v:video, s:subtitle, all:all of packet").default_value("all");
+	arg_parser.add_argument("-w").help("write vide or audio data to ouput file");
+	arg_parser.add_argument("-l").help("write printf log to output file");
+	arg_parser.add_argument("-d").help("decoder packet and write the raw data to output file");
+	arg_parser.add_argument("-b").help("begin timestamp with float type").scan<'f', float>();
+	arg_parser.add_argument("-e").help("end timestamp with float type").scan<'f', float>();
+    
+	try {
+        arg_parser.parse_args(argc, argv);
+    } catch (const std::exception& err) {
+        //std::cerr << err.what() << std::endl;
+        std::cerr << arg_parser;
+        return 0;
+    }
+
+    if (arg_parser.is_used("-i")) {
+        input_url = arg_parser.get<std::string>("-i");
+    }
+    if (arg_parser.is_used("-h")) {
+        std::string usage = arg_parser.usage();
+        std::cout << arg_parser.usage() << std::endl;
+    }
+	if (arg_parser.is_used("-p")) {
+		parser_flag = parserFlag(arg_parser.get<std::string>("-p").c_str());
+	}
+
+	if (arg_parser.is_used("-d")) {
+		dec_flag = parserFlag(arg_parser.get<std::string>("-p").c_str());
+	}
+
+	if (arg_parser.is_used("-w")) {
+		write_flag = parserFlag(arg_parser.get<std::string>("-w").c_str());
+	}
+
+	if (arg_parser.is_used("-b")) {
+		begin = arg_parser.get<float>("-b") * 1000000;
+	}
+
+    if (arg_parser.is_used("-e")) {
+		end = arg_parser.get<float>("-e") * 1000000;
+	}
+
+    if (input_url.empty()) {
+        printf("usage:%s\n", arg_parser.help().str().c_str());
+    }
+	FFDemuxer* ffdec = new FFDemuxer();
+	/*const char* purl = "D:\\Downloads\\Frozen.2013.UHD.BluRay.2160p.10bit.HDR.4Audio.TrueHD(Atmos).7.1.DTS-HD.MA.7.1.x265-beAst.mkv";
+	if (argc >= 2)
+	{
+		purl = argv[1];
+	}
+
+	
+	/*int i = 2;
 	for(int i = 2; i < argc; i++)
 	{
         if (strcmp(argv[i], "-l") == 0)
@@ -103,26 +122,23 @@ int main(int argc, const char** argv)
             i++;
             end = atof(argv[i])*1000000;
         }
-	}
+	}*/
 
 	if (parser_flag <= 0 && write_flag <= 0 && dec_flag <= 0) {
-		parser_flag = ENABLE_VIDEO | ENABLE_AUDIO | ENABLE_SUBTITLE;
+		printf("%s\n", arg_parser.usage().c_str());
+		return 0;
+		//parser_flag = ENABLE_VIDEO | ENABLE_AUDIO | ENABLE_SUBTITLE;
 	}
 
-    if (log_flag)
+    if (!log_path.empty())
     {
-        freopen("output.txt", "w", stdout);
+        freopen(log_path.c_str(), "w", stdout);
     }
-	//const char* purl = "D:\\media\\video\\Dunkirk.2017.IMAX.2160p.UHD.BluRay.REMUX.DV.HDR10Plus.HEVC.TrueHD.7.1.96K-WiLDCAT.mkv";
+
 	ffdec->setDemuxerFlag(parser_flag, dec_flag, write_flag);
-	int ret = ffdec->open(purl);
+	int ret = ffdec->open(input_url.c_str());
 	printf("ret:%d = ffdec->open(purl)\n", ret);
-	//return 0;
-	/*int64_t duration = ffdec->parserDuration(AVMEDIA_TYPE_AUDIO);
-	if (duration <= 0)
-	{
-		duration = ffdec->parserDuration(AVMEDIA_TYPE_VIDEO);
-	}*/
+
 	ffdec->seek(begin);
 
 	ffdec->start(end);
