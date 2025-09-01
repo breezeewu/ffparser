@@ -38,7 +38,7 @@ int main(int argc, const char** argv)
 	std::string log_path;
     std::string input_url;
 
-	argparse::ArgumentParser arg_parser("ffparser");
+	argparse::ArgumentParser arg_parser("ffparser", "ffparser 1.0.0");
     arg_parser.add_argument("-i").help("input file path");
 	arg_parser.add_argument("-p").help("printf packet timestamp of media packet, a:audio,v:video, s:subtitle, all:all of packet").default_value("all");
 	arg_parser.add_argument("-w").help("write vide or audio data to ouput file");
@@ -50,7 +50,7 @@ int main(int argc, const char** argv)
 	try {
         arg_parser.parse_args(argc, argv);
     } catch (const std::exception& err) {
-        //std::cerr << err.what() << std::endl;
+        std::cerr << err.what() << std::endl;
         std::cerr << arg_parser;
         return 0;
     }
@@ -75,11 +75,11 @@ int main(int argc, const char** argv)
 	}
 
 	if (arg_parser.is_used("-b")) {
-		begin = arg_parser.get<float>("-b") * 1000000;
+		begin = (int64_t)(arg_parser.get<float>("-b") * 1000000);
 	}
 
     if (arg_parser.is_used("-e")) {
-		end = arg_parser.get<float>("-e") * 1000000;
+		end = (int64_t)(arg_parser.get<float>("-e") * 1000000);
 	}
 
     if (input_url.empty()) {
